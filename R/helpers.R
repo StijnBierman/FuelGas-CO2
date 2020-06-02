@@ -11,7 +11,7 @@ if ( DoRun ) {
                 mu_B = 500,
                 sd_B = 25,
                 rho = 0.96,
-                rho_B = 0.9)
+                rho_B = 0)
   
   ExtraPars <- list(K = 24*365*4,
                     mu_aux = 2,
