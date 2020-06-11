@@ -1,0 +1,16 @@
+\clearpage
+\section{Model Validation}\label{Validation}
+
+\subsection{Representativeness of the sample}
+
+Samples can be taken at regular time intervals, as long as it can be demonstrated that there are no periodic trends in the EF that coincide with the sampling frequency. A simple time series plot of EF measurements is informative: if there are no apparent time-trends then more or less regular sampling during the year is acceptable. If there are large gaps during the year, e.g. of one or more months without any samples being taken and if there are (or may be) longer-term trends (lasting weeks and months) in EF, then the set of collected samples may no longer be representative for the annual average.
+
+\subsection{Validity of the regression model}
+More precise estimates can be obtained with auxiliary variables. However, the validity of these estimates depends to a large extent on the validity of the regression model (see for example chapter 4 in \cite{vanZanten}). Deviations of measurements from the regression line are assumed ot be independent and Normally distributed variables, with constant variance across the range of predicted values. A number of diagnostic plots can be used to assess whether these assumptions are reasonable, or to see if there are indications that they are violated.
+\begin{itemize}
+	\item Time series plots of model residuals should show no apparent patterns. If there are pattterns, then it is worth investigating whether or nor the residuals correlate with other variables (if available).
+	\item A Quantile-Quantile plot to check if the model residuals are (at least approximately) normally distributed
+	\item A scatterplot of predicted versus observed values, to check for potential outliers, and to see of the variability (the ``scatter'' around the 1:1 line) is roughly constant across the predicted range of values.
+\end{itemize}
+
+A good graphical analysis of the residuals is key for a good appraisal of the validity of the model.

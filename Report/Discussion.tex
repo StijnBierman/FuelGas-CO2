@@ -1,0 +1,27 @@
+\clearpage
+\section{Summary of main Results}\label{Discussion}
+A number of statistical procedures (estimators) for estimating the mean annual EF as well as the relative uncertainty of the estimate of the mean, have been described and assessed using a simulation study. The aim was to better understand the performance of these estimators, in terms of their relative uncertainties and coverage probabilities, under different scenarios for variability in EF measurements, flow rates, sample sizes and correlations between the key variables.
+
+The main learnings are:
+\begin{itemize}
+	\item The use of an auxiliary variable has the potential to greatly increase the precision of the estimate of the annual average EF. In order to obtain very high precision of estimates, for example less than 0.5\% relative uncertainty, it is necessary to have an auxiliary variable which correlates strongly with EF measurements.
+	\item Without an auxiliary variable, a large number of samples is required to get high precision.
+	\item A simulation tool has been developed in an App that can be used to find the required sample size to obtain a specified precision, as a function of the main variables of interest: process variability in EF, variability in flow rates and correlations between the variables of interest. The parameters can be estimated from actual process data. An example from a fuel gas in the Pernis refinery is included,
+	\item Estimators based on auxiliary variables are model based, so model checking is required as outlined in \citet{vanZanten} and in chapter~\ref{Validation}.
+	\item The van Zanten estimator has good performance and good coverage probability, except when the variability in flow rate is high and the flow rate is correlated with EF.
+	\item The coverage of the linear regression estimator is slightly too low if the variability in flow rates is high. The performance of the linear regression estimator does not deteriorate when there is a correlation between flow rate and EF.
+	\item The Bootstrap estimators have good performance, and can readily be extended to multiple regression, or other types of relationships of needed.
+	\item The following factors have a particularly large influence on the relative uncertainty:
+	\begin{itemize}
+		\item The sample size $n$ (number of laboratory measurements on samples taken from the flow of the fuel gas): the larger the sample size, the smaller the relative uncertainty.
+		\item The process variability in EF $\sigma_Y$: the larger the process variability in EF the larger the relative uncertainty.
+		\item The correlation between the auxiliary variable and EF $\rho_{XY}$: the stronger the correlation (the closer it is to 1) the lower the relative uncertainty.
+	\end{itemize}
+\end{itemize}
+
+If there is a single auxiliary variable and there is no correlation between flow rate and EF, then the van Zanten estimator is appropriate if the other assumptions that apply to this method are reasonable (see \citet{vanZanten} and chapter~\ref{Validation}).
+If, in addition to the above, the variability in flow rates is low, then the regression estimator from \citet{Cochran77} is also acceptable. This estimator has the advantage that it is described in textbooks and is easy to understand.
+
+The Bootstrap methods also perform well, and have the advantage that they can be readily extended to other situation, in particular for multiple regression when multiple auxiliary variables are available. A disadvantage of the Bootstrap is that it can only be implemented using specialist statistical software.
+
+An analysis of data from a fuel gas in the Pernis refinery indicates a number of potential candidates for auxiliary variables. A multiple linear regression model of EF on Stoichiometric Air Requirement (SAR) or Lower Heating Value (LHV) and molar weight yields predictions that correlate very strongly with measured EF (figure~\ref{fig:SAR_y_predicted_SAR_molweight_peryear}). This is encouraging because, if a device can be found which can measure online a variable which correlates with SAR or LHV, then this may result in a model with good predictive performance in combination with online molar weight measurements.

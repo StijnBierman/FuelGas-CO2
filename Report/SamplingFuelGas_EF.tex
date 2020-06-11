@@ -1,0 +1,62 @@
+\documentclass[17pt,a4paper,notitlepage]{article}
+\pagestyle{plain}
+%\usepackage[retainorgcmds]{IEEEtrantools}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{graphicx}
+%\usepackage{extsizes}
+%\usepackage[font=small]{caption}\textsc{\textsc{}}
+\usepackage{url}
+\usepackage{natbib}
+\bibliographystyle{plainnat}
+\usepackage{hyperref}
+\usepackage[absolute]{textpos}
+\setlength{\TPHorizModule}{1mm}
+\setlength{\TPVertModule}{1mm}
+%\usepackage[toc,page]{appendix}
+%\usepackage{algorithm}
+%\usepackage[noend]{algpseudocode}
+%\usepackage{tikz}
+%\usetikzlibrary{arrows}
+\usepackage{algorithm2e}
+
+\usepackage[left=2cm,top=2cm,right=2cm]{geometry}
+
+\begin{document}
+
+\title{Statistical methods to estimate the mean annual Emission Factor of a  fuel gas stream with variable composition. }
+\author{DRAFT  Stijn Bierman, GSNL-PTX D/S}
+\date{\today}
+\maketitle
+
+\abstract{Precise estimates of greenhouse gas emissions of refineries are required for regulatory compliance and to measure improvements in terms of reduced net emissions. For example, refineries in The Netherlands which want to take part in $\text{CO}_2$ emissions trading are required by the Dutch Emissions Authority (NEA) to report estimates of the annual average Emission Factor (EF; the amount of produced $\text{CO}_2$ per amount of combusted fuel gas) of each refinery fuel gas. 
+	
+The composition of refinery fuel gases, and therefore also the EF, varies with time. The EF of a sample, taken from the flow of a refinery fuel gas, can be measured in the laboratory. The cost per sample is relatively high, and a large number of samples is typically required to estimate the annual average EF with sufficient precision. For the same number of laboratory samples, more precise estimates can be obtained if an auxiliary variable is available which correlates strongly enough with laboratory measurements of EF and can be measured at low cost and high frequency. Ideally, an auxiliary variable can be measured continuously using an online measurement device which is permanently in place. 
+
+An overview is given of statistical recipes (estimators) which yield estimates of the annual average EF and associated precision, based on laboratory measurements alone or on a combination of laboratory measurements and one or more continuously monitored auxiliary variables. Estimators are compared in terms of their uncertainty, measured by the width of the 95\% confidence interval of the mean, and their coverage probability, i.e. the proportion of cases in which the confidence interval contains the true average EF. This is done using a simulation study. 
+
+The uncertainty of the estimate of the annual average EF depends on sample size as well as on the process variability in EF The use of an auxiliary variable greatly increases the precision of estimates. Bootstrap estimators have good performance, and can readily be extended to multiple regression in case multiple auxiliary variables are required to get predicted EF which correlates strongly with EF. 
+
+In a study of a fuel gas in Pernis, EF was found to correlate strongly with Stoichiometric Air Requirement (SAR) and Lower Heating Value (LHV). Models which combine either SAR or LHV with molar mass can predict EF to a high precision. Molar mass is currently already measured online. If additional online measurements can be done which correlate with either SAR or LHV (or which measure these variables directly), such as a calorimeter or oxygen content, then this could greatly improve the estimates of annual average EF for fuel gas in Pernis.
+}
+
+\clearpage
+\tableofcontents  % Mandatory item, do not remove it.
+\listoffigures    % This can be remarked out if not needed.
+\listoftables     % This can be remarked out if not needed.
+
+\input{Intro}
+\input{Estimators}
+\input{Validation}
+\input{Simulations}
+\input{Combining}
+%\input{Results}
+\input{Pernis_Data_Analysis}
+%\input{Discussion}
+
+\clearpage
+\bibliography{ref}
+\clearpage
+
+
+\end{document}

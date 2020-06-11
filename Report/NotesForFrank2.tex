@@ -1,0 +1,41 @@
+\documentclass[17pt,a4paper,notitlepage]{article}
+\pagestyle{plain}
+%\usepackage[retainorgcmds]{IEEEtrantools}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{graphicx}
+%\usepackage{extsizes}
+%\usepackage[font=small]{caption}\textsc{\textsc{}}
+\usepackage{url}
+\usepackage{natbib}
+\bibliographystyle{plainnat}
+\usepackage{hyperref}
+\usepackage[absolute]{textpos}
+\setlength{\TPHorizModule}{1mm}
+\setlength{\TPVertModule}{1mm}
+%\usepackage[toc,page]{appendix}
+
+\usepackage[left=2cm,top=2cm,right=2cm]{geometry}
+\input{Notation}
+
+\begin{document}
+
+\title{Statistical methods to estimate the mean annual Emission Factor of a fuel gas, and confidence interval of the estimated mean. }
+\author{Stijn Bierman}
+\date{\today}
+\maketitle
+
+\abstract{Reliable estimates of greenhouse gas emission of refineries and petrochemical plants are required in order to demonstrate both regulatory compliance and continuous improvement in terms of reductions in net emissions relative to the  amounts of produced products. For example, if refineries in The Netherlands are to take part in $\text{CO}_2$ emissions trading, the Dutch emissions authority (NEA) requires the annual average Emission Factor of a fuel gas (EF; the amount of produced $\text{CO}_2$ per amount of burnt fuel gas) to be estimated with a prescribed minimum level of precision. }
+\tableofcontents  % Mandatory item, do not remove it.
+%\listoffigures    % This can be remarked out if not needed.
+%\listoftables     % This can be remarked out if not needed.
+
+\input{Intro}
+%\input{Discussion}
+
+\clearpage
+\bibliography{ref}
+\clearpage
+
+
+\end{document}

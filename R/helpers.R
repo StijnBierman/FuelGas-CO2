@@ -4,14 +4,14 @@ rm(list=ls())
 # simulate data
 DoRun <- FALSE
 if ( DoRun ) {
-  input <- list(nsims = 25,
-                n = 100,
+  input <- list(nsims = 10000,
+                n = 50,
                 mu_EF = 2.5,
                 sd_EF = 0.15,
-                mu_B = 500,
-                sd_B = 25,
+                mu_B = 10000,
+                sd_B = 2000,
                 rho = 0.96,
-                rho_B = 0)
+                rho_B = 0.95)
   
   ExtraPars <- list(K = 24*365*4,
                     mu_aux = 2,
@@ -21,15 +21,16 @@ if ( DoRun ) {
   FitAuxModel(FSimDat=TSimDat,Finput=input,doGraph=TRUE,returnAuxLm=FALSE)
   
   RAuxLm <- FitAuxModel(FSimDat=TSimDat,Finput=input,doGraph=FALSE,returnAuxLm=TRUE)
-  Results <- ApplyEstimatorsApp(QAuxLm=RAuxLm,QSimDat=TSimDat,Qinput=input,QExtraPars=ExtraPars,doBoot=TRUE,nboots=250)
+  Results <- ApplyEstimatorsApp(QAuxLm=RAuxLm,QSimDat=TSimDat,Qinput=input,QExtraPars=ExtraPars,doBoot=FALSE,nboots=250)
   Results
   #
   #to <- Sys.time()
-  SimResults <- SimulateResults(Zinput=input,ZExtraPars=ExtraPars,doBoot=TRUE,nboots=500)
+  SimResults <- SimulateResults(Zinput=input,ZExtraPars=ExtraPars,doBoot=FALSE,nboots=500)
   #Sys.time()-to
   #SimResults
   100*SimResults$QCoverage/input$nsims
-  TableResults(TSimRes=SimResults, doBoot=TRUE, Tinputs=input)#
+  TableResults(TSimRes=SimResults, doBoot=FALSE, Tinputs=input)
+  #
   ##
   #par(mfrow=c(1,1))
   #plotResults(VSimResults=SimResults, plotCoverage=TRUE, doBoot = TRUE,Vinputs=input)
@@ -140,9 +141,9 @@ ApplyEstimatorsApp <- function(QAuxLm=AuxLm,QSimDat=SimDat,Qinput=input,QExtraPa
   # as in NEA (Netherlands Emissions Authority) Excel sheet
   
   srs <- list(estimate = mean(QSimDat$y_samp),
-               #se = sd(SimDat$y_samp)/sqrt(n),
-               se = sd(QSimDat$y_samp)/sqrt(Qinput$n),
-               t_val = qt(p = 0.975, df = Qinput$n-1))
+              #se = sd(SimDat$y_samp)/sqrt(n),
+              se = sd(QSimDat$y_samp)/sqrt(Qinput$n),
+              t_val = qt(p = 0.975, df = Qinput$n-1))
   srs$Low <- srs$estimate-srs$t_val*srs$se
   srs$Up <- srs$estimate+srs$t_val*srs$se
   #srs$U <- abs(srs$Up-srs$Low) # old definition
@@ -165,14 +166,19 @@ ApplyEstimatorsApp <- function(QAuxLm=AuxLm,QSimDat=SimDat,Qinput=input,QExtraPa
 
   # 2b. regression estimator assuming x_bar is known
   # weighted by throughput
+  nE <- floor(sum(w_samp)^2/sum(w_samp^2))
   lrA <- list(estimate = y_samp_bar + QAuxLm$b*(QSimDat$x_bar - x_samp_bar),
               se_bit1 =  sum((QSimDat$y_samp - y_samp_bar)^2),
               se_bit2 = sum((QSimDat$y_samp-y_samp_bar)*(QSimDat$x_samp-x_samp_bar))^2,
               se_bit3 = sum((QSimDat$x_samp-x_samp_bar)^2),
-              t_val = qt(p = 0.975, df = Qinput$n-2))
-  lrA$se <- sqrt( (1/(Qinput$n*(Qinput$n-2))) * (lrA$se_bit1 - (lrA$se_bit2/lrA$se_bit3)) )
-  lrA$Low <- lrA$estimate-lrA$t_val*lrA$se
-  lrA$Up <- lrA$estimate+lrA$t_val*lrA$se
+              t_val = qt(p = 0.975, df = Qinput$n-2),
+              t_val_w = qt(p = 0.975, df = nE)
+              )
+  #browser()
+  #lrA$se <- sqrt( (1/(Qinput$n*(Qinput$n-2))) * (lrA$se_bit1 - (lrA$se_bit2/lrA$se_bit3)) )
+  lrA$se <- sqrt( (1/(Qinput$n*(nE-2))) * (lrA$se_bit1 - (lrA$se_bit2/lrA$se_bit3)) )
+  lrA$Low <- lrA$estimate-lrA$t_val_w*lrA$se
+  lrA$Up <- lrA$estimate+lrA$t_val_w*lrA$se
   # lrA$U <- abs(lrA$Up-lrA$Low) # old definition
   lrA$U <- abs(lrA$Up-lrA$estimate) # new definition
   lrA$relU <- 100*(lrA$U/lrA$estimate)

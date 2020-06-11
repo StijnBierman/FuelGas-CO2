@@ -1,0 +1,186 @@
+\clearpage
+\section{Estimators}\label{Estimators}
+ 
+Let $y_i$ be the EF as measured in the laboratory on sample $i$; $i=1,2,\ldots ,n$, where $n$ denotes the number of samples taken from the fuel gas flow during the year (the sample size). Triples of laboratory (EF; $y_i$), auxiliary ($x_i$) and flow rate ($b_i$) measurements at the time that sample $i$ was taken are denoted by: $(y_i,x_i,b_i)$. The assumption is that measurements of the flow rate and auxiliary variable are always available at the time a sample was taken. Let $X_{j}$ and $B_j$ be a measurement of an auxiliary variable and flow rate respectively, where $j=1,2,\ldots,k$ is the total number of measurements of this auxiliary variable taken on the fuel gas flow during the year. Typically, $k \gg n$, because the auxiliary variable and flow rate can be measured at high frequency at relatively low cost. 
+
+Below, a number of statistical procedures (estimators) are given for estimating the annual average EF, $\bar{y}$, and the lower and upper bound of the 95\% confidence interval, $\bar{Y}_{L}$ and $\bar{Y}_{U}$ respectively. The width $U$ of the confidence interval is given by $U=\bar{Y}_{L}-\bar{Y}_{U}$. The relative precision,$\%U$, of the estimate $\bar{y}$ is given by half the width of the confidence interval divided by the estimate of the annual average: $\%U=100\frac{U}{2\bar{y}}$.
+
+\subsection{Without auxiliary variable: Simple Random Sampling (SRS)}\label{SRS}
+If no auxiliary variable is available, and assuming that a representative sample of the fuel gas flow has been taken, the annual average EF can be estimated as:
+\begin{equation}\label{eqn:SRS}
+\bar{y}=\Sigma_{i=1}^{n}(y_i w_i),
+\end{equation}
+where $w_i$ is given by:
+\begin{equation}\label{eqn:weights}
+w_i=\frac{b_i}{\Sigma_{i=1}^{n}b_i}.
+\end{equation}
+
+Samples can be taken at regular time intervals, as long as it can be demonstrated that there are no periodic trends in the EF that coincide with the sampling frequency. A simple time series plot of EF measurements is informative: if there are no apparent time-trends then more or less regular sampling during the year is acceptable. If there are large gaps during the year, e.g. of one or more months without any samples being taken and if there are (or may be) longer-term trends (lasting weeks and months) in EF, then the set of collected samples may no longer be representative for the annual average.
+
+An estimate of the standard error of the weighted mean given by equation~\ref{eqn:SRS} is given by (see \cite{GATZ19951185} and \cite{Cochran77}):
+\begin{equation}\label{eqn:varSRS}
+s_{\bar{y}}=\sqrt{\frac{n}{n-1} \Sigma_{i=1}^{n}[w_i^2 (y_i-\bar{y})^2]}
+\end{equation}
+
+The upper and lower bound of the 95\% confidence interval are given by:
+\begin{subequations}\label{eqn:ciSRS}
+	\begin{align}
+	\bar{y}_{L} &= \bar{y}-t_{0.975;n-1}s_{\bar{y}} \\
+	\bar{y}_{U} &= \bar{y}+t_{0.975;n-1}s_{\bar{y}} ,
+\end{align}
+\end{subequations}
+where $t_{0.975;n-1}$ is the 97.5 percentile of the t distribution with $n-1$ degrees of freedom.
+
+\subsection{Without auxiliary variable: Bootstrap}\label{SRSBoot}
+A non-parametric Bootstrap (see \cite{EfroTibs93}) method can be used to estimate the standard error or confidence interval of $\bar{y}$. Synthetic data sets are created by drawing samples at random with replacement from the observed set of samples. Each synthetic data set is of equal size to the observed data set, and consists of measurements that were present in the original (actual) data set, although not every measurement in the original data set may have been drawn for inclusion in the synthetic data set and other measurements may have been chosen more than once. The weighted mean is computed for each synthetic data set using equation~\ref{eqn:SRS}). This way, a statistical distribution of means is formed from which the 2.5 an 97.5 percentiles are taken as the lower and upper limits respectively of the 95\% confidence interval. Pseudocode with an outline of the Bootstrap procedure is given in Algorithm~\ref{PseudoBootSRS}.
+
+\RestyleAlgo{boxruled}
+\LinesNumbered
+\DontPrintSemicolon
+\SetKwFor{RepTimes}{repeat}{times}{end}
+\begin{algorithm}[h] \label{PseudoBootSRS}
+	\caption{Bootstrap estimate of the confidence interval of a weighted sample mean}
+	\KwData{The set of $n$ pairs of measurements $(y_i,b_i)$}
+	Initialization: Generate a sequence of integers $r={1,2,\ldots,n}$\;
+	\RepTimes{M}{
+		Generate a random set $r^*$ of indicators by drawing $n$ values at random with replacement from the set $r$\;
+		Create a synthetic data set of $n$ pairs of values $(y_{r},b_{r})$, where the indicators $r$ are taken from the set $r^*$ which was created in the previous step\;
+		Based on the synthetic data, compute the weighted sample mean  $\bar{y^*}=\frac{\Sigma(y_{r} b_{r})}{\Sigma b_{r}}$, and store this value in a vector\;
+	}
+	Rank the vector of size $M$ with sample means $\bar{y^*}$ from smallest to largest and take the 2.5 and 97.5 percentiles as estimates of the lower and upper bounds of the confidence interval of the mean respectively.
+\end{algorithm}
+
+Advantages of the Bootstrap:
+\begin{itemize}
+	\item The methodology is generic: any estimator for the mean may be used instead of the weighted mean.
+	\item It is relatively straightforward to implement in a common data science language such as \textit{R}, \textit{Python} or \textit{Matlab}.
+	\item If the sample size is large enough (a rule of thumb is more than $n=50$ measurements for a reasonably symmetric distribution of values), and the measurements are independent and representative draws from the population, then this method will tend to yield reasonable estimates with good coverage probability.
+\end{itemize}
+
+The main disadvantages of the Bootstrap are:
+\begin{itemize}
+	\item It is a computationally intensive method.
+	\item This method does not work well with small sample sizes (e.g. less than $n=50$ samples).
+	\item The assumptions under which the results are valid are less explicit compared to a fully parametric method.
+\end{itemize}
+
+\subsection{With a single auxiliary variable: regression estimator as in Cochran, 1977}\label{AuxCochran}
+
+The linear regression estimator is designed to increase precision by use of an auxiliary variable $x$ which is correlated with the actual variable of interest $y$ (\cite{Cochran77}, page 189). For this estimator, it is assumed that the annual average of the auxiliary variable $\bar{X}$ is known:
+\begin{equation}\label{eqn:barbigX}
+\bar{X}=\frac{\Sigma_{j=1}^k B_j X_j}{\Sigma_{j=1}^k B_j} 
+\end{equation}
+This is reasonable only when both the auxiliary variable and flow rate are monitored continuously and at high frequency during the entire year, and a value is stored for example every hour or every 15 minutes.
+
+The linear regression estimate of the annual average EF is given by:
+\begin{equation}\label{eqn:lr}
+\bar{y}_{lr}=\bar{y}+a_1(\bar{X}-\bar{x}),
+\end{equation}
+where the subscript $lr$ denotes \textit{linear regression} and $a_1$ is the slope of a linear regression line as an estimate of the increase in $y$ for a unit increase in the value of $x$ (see equation 7.1 in \cite{Cochran77}). In equation~\ref{eqn:lr}, $\bar{x}$ is the weighted sample mean of the auxiliary variable:
+\begin{equation}\label{eqn:barx}
+\bar{x}=\Sigma_{i=1}^{n}(x_i w_i),
+\end{equation}
+with the $w_i$ as given in equation~\ref{eqn:weights}.
+
+The parameter $a_1$ is obtained using the usual least squares estimator:
+\begin{equation}\label{eqn:b}
+a_1=\frac{\Sigma_{i=1}^n[(y_i-\hat{y})(x_i-\hat{x})]}{\Sigma_{i=1}^n[x_i-\hat{x}]^2},
+\end{equation}
+where $\hat{y}=n^{-1}\Sigma y_i$ and $\hat{x}=n^{-1}\Sigma x_i$ are simple unweighted arithmetic means.
+
+The rationale behind the estimator as given in equation~\ref{eqn:lr} is that if due to random sampling variability $\bar{x}$ is below the annual average $\bar{X}$, then the expectation is that estimate $\bar{y}$ will be below average by an amount $a_1(\bar{X}-\bar{x})$ (\cite{Cochran77}, page 189).
+We note that the estimator given in equation~\ref{eqn:lr} is not identical to equation 7.1 in \cite{Cochran77} because of the use of a weighted arithmetic mean instead of a simple arithmetic mean.
+
+An estimate of the standard error of $\bar{y}_{lr}$ is given by equation 7.29 in \citet{Cochran77}:
+\begin{equation}\label{eqn:varlr}
+s_{\bar{y}_{lr}}=\sqrt{ \frac{1}{n-2} \Sigma_{i=1}^{n}[(y_i-\bar{y}_{lr})(x_i-\bar{x})]^2 }
+\end{equation}
+
+The upper and lower bound of the 95\% confidence interval are given by:
+\begin{subequations}\label{eqn:cilr}
+	\begin{align}
+	\bar{y}_{L} &= \bar{y}_{lr}-t_{0.975;n-2}s_{\bar{y}_{lr}} \\
+	\bar{y}_{U} &= \bar{y}_{lr}+t_{0.975;n-2}s_{\bar{y}_{lr}} ,
+	\end{align}
+\end{subequations}
+where $t_{0.975;n-2}$ is the 97.5 percentile of the t distribution with $n-2$ degrees of freedom.
+
+We note that the estimator of the standard error given by equation~\ref{eqn:varlr} does not take the variability in the flow rate measurements into account. %Another important thing to note is that all measurements must be from the year to which the estimate of the annual average EF applies.  %This estimator may therefore underestimate the width of the confidence interval, with consequent poor coverage probabilities, if the variability in flow rates is high.
+
+\subsection{With a single auxiliary variable: regression estimator as in van Zanten, 2016}\label{AuxVZ}
+
+A regression estimator for the average annual EF is described in \citet{vanZanten}:
+\begin{equation}\label{eqn:vanzanten}
+\bar{y}_{vz} = a_0 + a_1\bar{X},
+\end{equation}
+where the subscript $vz$ refers to the author of the technical report \citet{vanZanten}, $\bar{X}$ is given by equation~\ref{eqn:barbigX}. 
+
+The parameters $a$ and $b$ are the intercept and slope respetively of a linear regression model, $y_i = a_0 + a_1 x_j + z_j$, where $z_j$ are stochastic variables that give the deviations between measured and predicted values. The $z_j$ are assumed to be independent and Normally (Gaussian) distributed. The slope parameter $a_1$ is given by equation~\ref{eqn:b}. The intercept $a_0$ is given by:
+\begin{equation}\label{eqn:a}
+a_0 = \hat{y}-a_1\hat{x},
+\end{equation}
+where $\hat{y}=n^{-1}\Sigma y_i$ and $\hat{x}=n^{-1}\Sigma x_i$ are simple unweighted arithmetic means.
+
+The estimator for the standard error of $\bar{y}_{vz}$ is given in equation 7 in \citet{vanZanten}:
+\begin{equation}\label{eqn:varvz}
+s_{\bar{y}_{vz}}=s_{re} \sqrt{n^{-1} \frac{\Sigma_{i=1}^n [x_i-\bar{X}]^2}{\Sigma_{i=1}^n [x_i - \hat{x}]^2} + m^{-1} \left( 1 + \frac{k^{-1}\Sigma_{j=1}^k[B_j-\hat{B}]^2}{ (\hat{B})^2 } \right) },
+\end{equation}
+where $\hat{y}=n^{-1}\Sigma y_i$, $\hat{x}=n^{-1}\Sigma x_i$ and $\hat{B}=k^{-1}\Sigma B_j$ are simple unweighted arithmetic means. The standard deviation of the residuals of the linear regression model $s_{re}$ is given by:
+\begin{equation}\label{eqn:sresiduals}
+s_{re}=\sqrt{\frac{\Sigma_{i=1}^n[z_i-\hat{z}]^2}{n-2}},
+\end{equation}
+where $\hat{z}=n^{-1}\Sigma z_j$ is the simple unweighted arithmetic mean of the model residuals.
+
+The upper and lower bound of the 95\% confidence interval are given by:
+\begin{subequations}\label{eqn:civz}
+	\begin{align}
+	\bar{y}_{L} &= \bar{y}_{vz}-t_{0.975;n-2}s_{\bar{y}_{vz}} \\
+	\bar{y}_{U} &= \bar{y}_{vz}+t_{0.975;n-2}s_{\bar{y}_{vz}} ,
+	\end{align}
+\end{subequations}
+where $t_{0.975;n-2}$ is the 97.5 percentile of the t distribution with $n-2$ degrees of freedom.
+
+It is not assumed that $\bar{X}$ is known without error. The variability in flow rate measurements is taken into account in the estimate of the standard error of the mean. %We note that it is assumed that the residuals of the regression model are not correlated with the flow rate.
+
+\subsection{With a single or multiple auxiliary variables: regression estimator with Bootstrap}\label{AuxBoot}
+
+The Bootstrap method, introduced in section~\ref{SRSBoot}, may also be applied to estimate the confidence interval of the mean based on a linear regression equation. Two variations of the algorithm are discussed:
+\begin{itemize}
+	\item A Bootstrap algorithm which assumes that the flow rate is not correlated with the EF and the auxiliary variable. In this algorithm, the EF is modelled as a linear function of the auxiliary variable only. 
+	\item A Boostrap algorithm in which the EF is modelled as a linear function of the auxiliary variable and flow rate. This is applicable only in situations where the flow rate correlates with the EF and auxiliary variable. 
+\end{itemize}
+The second variation of the algorithm, with the linear regression of EF on both the flow rate and auxiliary variables, is included because the flow rate plays an important role in computing the weighted means and because the estimators in sections~\ref{AuxCochran} and~\ref{AuxVZ} do not take this possibility into account. A question of interest is therefore what the performance, in terms of coverage probabilities, of the estimators is when the flow rate correlates with the EF.
+Pseudocode for the Bootstrap algorithm is given in Algrotihm~\ref{lrBoot1}.
+
+The Bootstrap procedures outlined in this section can easily be extended to include more variables and slope parameters.
+
+\RestyleAlgo{boxruled}
+\LinesNumbered
+\DontPrintSemicolon
+\SetKwFor{RepTimes}{repeat}{times}{end}
+\begin{algorithm}[h] \label{lrBoot1}
+	\caption{Bootstrap estimate of the confidence interval of an estimate of the mean based on a linear regression equation of EF on the auxiliary variable (version 1) or both the auxiliary variable and flow rate (version 2).}
+	\KwData{$n$ triples of measurements $(y_i,x_i,b_i)$; $k$ pairs of measurements ($X_j,B_j$); $k$ weights $W_j=\frac{B_j}{\Sigma_{j=1}^{k} B_j}$}
+	Initialization: Generate a sequence of integers $r={1,2,\ldots,n}$\;
+	\RepTimes{M}{
+		Generate a random set $r^*$ of indicators by drawing $n$ values at random with replacement from the set $r$\;
+		Create a synthetic data set of $n$ pairs of values $(y_{r},x_{r})$, where the indicators $r$ are taken from the set $r^*$ which was create in the previous step\;
+		\If{regression model based on auxiliary variable}{
+			Based on the synthetic data compute the intercept $a_0^*$ and slopes $a_1^*$ of the  linear regression equation $y_r=a_0^*+a_1^* x_r+z_r$ (using the standard least squares estimator for these parameters)\;
+			Compute the standard deviation of the residuals of the regression model, $s^*_{re}$ \;
+			Create a synthetic data set of $j=1,2,\ldots,k$ estimates of EF, $q_j$: $q_j=a_0^* + a_1^* X_j + z^*_j$, where the $z^*_j$ are drawn at random from a Normal distribution with mean zero and standard deviation $s^*_{re}$\;
+		}
+		\If{regression model based on auxiliary variable and flow rate}{
+			Based on the synthetic data compute the intercept $a_0^*$ and slopes $a_1^*$ and $a_2$ of the  linear regression equation $y_r=a_0^*+a_1^* x_r+a_2^* b_r+z_r$ (using the standard least squares estimator for these parameters)\;
+			Compute the standard deviation of the residuals of the regression model, $s^*_{re}$ \;
+			Create a synthetic data set of $j=1,2,\ldots,k$ estimates of EF, $q_j$: $q_j=a_0^* + a_1^* X_j +a_2^* B_j + z^*_j$, where the $z^*_j$ are drawn at random from a Normal distribution with mean zero and standard deviation $s^*_{re}$\;
+			
+		}
+		Based on the synthetic set of measurements $q_j$ compute the weighted mean $\bar{y^*}=\Sigma_{j=1}^{k}[W_jq_j]$ and store this value in a vector.
+	}
+	Rank the vector of size $M$ with sample means $\bar{y^*}$ from smallest to largest and take the 2.5 and 97.5 percentiles as estimates of the lower and upper bounds of the confidence interval of the mean respectively.
+\end{algorithm}
+
+\citet{Thompson} (chapter 8) outlines a number of estimators based on multiple regression, and mentions that more research is needed on the topic (page 117 in \cite{Thompson}). For this reason, it may best to use the Bootstrap to estimate uncertainties for multiple regression models.
+
+
